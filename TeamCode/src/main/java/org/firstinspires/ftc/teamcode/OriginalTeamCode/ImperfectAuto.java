@@ -156,6 +156,7 @@ public class ImperfectAuto extends LinearOpMode {
         controlArmRotate();
         controlBothArmExtenders();
         controlWristRotate();
+        sleep(5000);
         /***** end of manual code running or initiation or whatever *****/
     }
 

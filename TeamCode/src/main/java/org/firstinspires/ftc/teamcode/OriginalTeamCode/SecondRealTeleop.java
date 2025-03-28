@@ -25,10 +25,10 @@ public class SecondRealTeleop extends LinearOpMode {
     final int ASCENT_UP = 14200;
     final int ASCENT_DOWN = 2200;
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftFrontDrive = null;
-    private DcMotor leftBackDrive = null;
-    private DcMotor rightFrontDrive = null;
-    private DcMotor rightBackDrive = null;
+    private DcMotor frontLeftDrive = null;
+    private DcMotor backLeftDrive = null;
+    private DcMotor frontRightDrive = null;
+    private DcMotor backRightDrive = null;
     //other motors
     DcMotor armLifterLeft = null;
     DcMotor armLifterRight = null;
@@ -74,10 +74,10 @@ public class SecondRealTeleop extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
 
-        leftFrontDrive = hardwareMap.dcMotor.get("leftFront");
-        leftBackDrive = hardwareMap.dcMotor.get("leftRear");
-        rightFrontDrive = hardwareMap.dcMotor.get("rightFront");
-        rightBackDrive = hardwareMap.dcMotor.get("rightRear");
+        frontRightDrive = hardwareMap.dcMotor.get("leftFront");
+        backLeftDrive = hardwareMap.dcMotor.get("leftRear");
+        frontRightDrive = hardwareMap.dcMotor.get("rightFront");
+        backRightDrive = hardwareMap.dcMotor.get("rightRear");
         armLifterLeft = hardwareMap.dcMotor.get("armLifterLeft");
         armLifterRight = hardwareMap.dcMotor.get("armLifterRight");
         armRotate = hardwareMap.dcMotor.get("armRotate");
@@ -106,10 +106,10 @@ public class SecondRealTeleop extends LinearOpMode {
         // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
         // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
         // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
@@ -154,20 +154,12 @@ public class SecondRealTeleop extends LinearOpMode {
 
             double max;
 
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            // Declare our motors
-            // Make sure your ID's match your configuration
-            DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-            DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
-            DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
-            DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
-
             // Reverse the right side motors. This may be wrong for your setup.
             // If your robot moves backwards when commanded to go forwards,
             // reverse the left side instead.
             // See the note about this earlier on this page.
-            frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            frontRightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+            backRightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
             waitForStart();
 
@@ -196,15 +188,15 @@ public class SecondRealTeleop extends LinearOpMode {
                 double frontRightPower = (rotY - rotX - rx) / denominator;
                 double backRightPower = (rotY + rotX - rx) / denominator;
 
-                frontLeftMotor.setPower(frontLeftPower);
-                backLeftMotor.setPower(backLeftPower);
-                frontRightMotor.setPower(frontRightPower);
-                backRightMotor.setPower(backRightPower);
+                frontLeftDrive.setPower(frontLeftPower);
+                backLeftDrive.setPower(backLeftPower);
+                frontRightDrive.setPower(frontRightPower);
+                backRightDrive.setPower(backRightPower);
                 if(slowMode > 0.2){
-                    frontLeftMotor.setPower(frontLeftPower*slowCoeff);
-                    frontRightMotor.setPower(frontLeftPower*slowCoeff);
-                    backLeftMotor.setPower(frontLeftPower*slowCoeff);
-                    frontRightMotor.setPower(frontLeftPower*slowCoeff);
+                    frontLeftDrive.setPower(frontLeftPower*slowCoeff);
+                    frontRightDrive.setPower(frontLeftPower*slowCoeff);
+                    backLeftDrive.setPower(frontLeftPower*slowCoeff);
+                    frontRightDrive.setPower(frontLeftPower*slowCoeff);
                 }
             }
 
@@ -240,7 +232,7 @@ public class SecondRealTeleop extends LinearOpMode {
             //extenders
             double rightTrig = gamepad2.right_trigger;
             double leftTrig = gamepad2.left_trigger;
-            if (armPos - rightTrig * 75 > -5833) {
+            if (armPos - rightTrig * 75 > -6500) {
                 armPos -= rightTrig * 75;
             }
             if (armPos + leftTrig * 75 < 2000) {
