@@ -14,13 +14,21 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.LLStatus;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
 // Team 23974 A.S.T.R.O. Vikings, water 2024-2025
 @Autonomous(name="Specimen And High Baskets Auto", group ="AHHHHHHHH", preselectTeleOp = "Teleop To Use :))))")
 public class PerfectAuto extends LinearOpMode {
+
+    Limelight3A limelight;
     final double OPEN = 0.75;
     final double CLOSE = 0.4;
     final double ARMROTMULT = 1;
@@ -72,6 +80,12 @@ public class PerfectAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
+        limelight.start(); // This tells Limelight to start looking!
+
+        limelight.pipelineSwitch(0); // Switch to pipeline number 0
+
         armLifterLeft = hardwareMap.dcMotor.get("armLifterLeft");
         armLifterRight = hardwareMap.dcMotor.get("armLifterRight");
         armRotate = hardwareMap.dcMotor.get("armRotate");
@@ -110,7 +124,26 @@ public class PerfectAuto extends LinearOpMode {
         linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armRotate.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (opModeIsActive()) {
+            LLResult result = limelight.getLatestResult();
+            if (result != null && result.isValid()) {
+                double tx = result.getTx(); // How far left or right the target is (degrees)
+                double ty = result.getTy(); // How far up or down the target is (degrees)
+                double ta = result.getTa(); // How big the target looks (0%-100% of the image)
 
+                telemetry.addData("Target X", tx);
+                telemetry.addData("Target Y", ty);
+                telemetry.addData("Target Area", ta);
+            } else {
+                telemetry.addData("Limelight", "No Targets");
+            }
+            if (result != null && result.isValid()) {
+                Pose3D botpose = result.getBotpose();
+                if (botpose != null) {
+                    double x = botpose.getPosition().x;
+                    double y = botpose.getPosition().y;
+                    telemetry.addData("MT1 Location", "(" + x + ", " + y + ")");
+                }
+            }
             // Push telemetry to the Driver Station.
             telemetry.update();
             // Share the CPU.

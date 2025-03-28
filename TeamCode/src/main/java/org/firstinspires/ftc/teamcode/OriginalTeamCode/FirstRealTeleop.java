@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.PwmControl.*;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
 
@@ -17,9 +18,16 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.LLStatus;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
 @TeleOp(name="Bot-Centric Teleop To Use :))))",group = "Teleops to use :))))))")
 public class FirstRealTeleop extends LinearOpMode {
 
+    Limelight3A limelight;
     // Declare OpMode members for each of the 4 motors.
 
     final int ASCENT_UP = 14200;
@@ -67,9 +75,8 @@ public class FirstRealTeleop extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        StandardTrackingWheelLocalizer localizer = new StandardTrackingWheelLocalizer(hardwareMap, new ArrayList<>(),new ArrayList<>());
-        localizer.setPoseEstimate(new Pose2d());
 
+        StandardTrackingWheelLocalizer localizer = new StandardTrackingWheelLocalizer(hardwareMap, new ArrayList<>(),new ArrayList<>());
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
 
@@ -141,11 +148,32 @@ public class FirstRealTeleop extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            localizer.update();
+            LLResult result = limelight.getLatestResult();
+            if (result != null && result.isValid()) {
+                double tx = result.getTx(); // How far left or right the target is (degrees)
+                double ty = result.getTy(); // How far up or down the target is (degrees)
+                double ta = result.getTa(); // How big the target looks (0%-100% of the image)
+
+                telemetry.addData("Target X", tx);
+                telemetry.addData("Target Y", ty);
+                telemetry.addData("Target Area", ta);
+            } else {
+                telemetry.addData("Limelight", "No Targets");
+            }
+            if (result != null && result.isValid()) {
+                Pose3D botpose = result.getBotpose();
+                if (botpose != null) {
+                    double x = botpose.getPosition().x;
+                    double y = botpose.getPosition().y;
+                    telemetry.addData("MT1 Location", "(" + x + ", " + y + ")");
+                }
+            }
+            // Push telemetry to the Driver Station.
+            telemetry.update();
+            // Share the CPU.
+            sleep(20);
             linearActuatorMover();
             controlBothArmExtenders();
-            double pose = drive.getExternalHeading(); // used for my custom function to drive straight thru the trusses
-
             double slowMode = gamepad1.left_trigger;
             double slowCoeff = 0.3;
 
