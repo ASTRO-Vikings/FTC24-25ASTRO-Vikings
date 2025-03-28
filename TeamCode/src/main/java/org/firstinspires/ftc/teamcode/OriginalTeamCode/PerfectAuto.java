@@ -141,6 +141,7 @@ public class PerfectAuto extends LinearOpMode {
                 if (botpose != null) {
                     double x = botpose.getPosition().x;
                     double y = botpose.getPosition().y;
+                    drive.setPoseEstimate(new Pose2d(x,y));
                     telemetry.addData("MT1 Location", "(" + x + ", " + y + ")");
                 }
             }
