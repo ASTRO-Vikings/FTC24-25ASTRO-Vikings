@@ -80,6 +80,11 @@ public class FirstRealTeleop extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
 
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
+        limelight.start(); // This tells Limelight to start looking!
+        limelight.pipelineSwitch(0); // Switch to pipeline number 0
+
         leftFrontDrive = hardwareMap.dcMotor.get("leftFront");
         leftBackDrive = hardwareMap.dcMotor.get("leftRear");
         rightFrontDrive = hardwareMap.dcMotor.get("rightFront");
@@ -145,10 +150,16 @@ public class FirstRealTeleop extends LinearOpMode {
         armLifterLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armRotate.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             LLResult result = limelight.getLatestResult();
+            telemetry.addData("","got latest result");
+            if(result!=null){
+                telemetry.addData("","result not null");
+                if(result.isValid()){
+                    telemetry.addData("","result is valid");
+                }
+            }
             if (result != null && result.isValid()) {
                 double tx = result.getTx(); // How far left or right the target is (degrees)
                 double ty = result.getTy(); // How far up or down the target is (degrees)
@@ -321,7 +332,7 @@ public class FirstRealTeleop extends LinearOpMode {
             telemetry.addData("Arm height", "Arm height: " + armPos);
             telemetry.addData("Arm rot", "Arm rot: " + armRotPos);
             telemetry.addData("wrist rot", "Wrist rot: " + wristPos);
-            telemetry.update();
+//            telemetry.update();
         }
     }
     }
