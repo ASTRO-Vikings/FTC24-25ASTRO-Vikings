@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -141,9 +142,10 @@ public class PerfectAuto extends LinearOpMode {
         if (result != null && result.isValid()) {
             Pose3D botpose = result.getBotpose();
             if (botpose != null) {
-                telemetry.addData("tx", result.getTx() +72);
-                telemetry.addData("ty", result.getTy() +72);
-                startPose = new Pose2d(result.getTy()+72, result.getTx()+72);
+                telemetry.addData("tx", result.getTx());
+                telemetry.addData("ty", result.getTy());
+                startPose = new Pose2d(new Vector2d(result.getBotpose().getPosition().x,result.getBotpose().getPosition().y),result.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES));
+                telemetry.addData("Start pose", startPose.toString());
             }
         }
         // Push telemetry to the Driver Station.
@@ -152,7 +154,7 @@ public class PerfectAuto extends LinearOpMode {
         drive = new SampleMecanumDrive(hardwareMap);
 
         Trajectory tr1 = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(0, 0), 0)
+                .splineTo(new Vector2d(0, -10), 90)
                 .build();
 //        Trajectory tr2 = drive.trajectoryBuilder(tr1.end())
 //                .back(7)
@@ -197,8 +199,8 @@ public class PerfectAuto extends LinearOpMode {
 //                })
 //                .build();
 //
-//        waitForStart(); /*****  DON'T RUN ANY MOTOR MOVEMENT ABOVE THIS LINE!! You WILL get PENALTIES! And it's UNSAFE! *****/
-//        if (isStopRequested()) return;
+        waitForStart(); /*****  DON'T RUN ANY MOTOR MOVEMENT ABOVE THIS LINE!! You WILL get PENALTIES! And it's UNSAFE! *****/
+        if (isStopRequested()) return;
 //
 //        /***** start of manual code running or initiation or whatever *****/
 //        controlGrabber(CLOSE);
