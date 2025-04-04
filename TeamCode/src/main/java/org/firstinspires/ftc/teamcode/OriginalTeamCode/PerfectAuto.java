@@ -130,6 +130,7 @@ public class PerfectAuto extends LinearOpMode {
             // Share the CPU.
             sleep(20);
         }
+
         LLResult result = limelight.getLatestResult();
         telemetry.addData("", "got latest result");
         if (result != null) {
@@ -142,29 +143,26 @@ public class PerfectAuto extends LinearOpMode {
         if (result != null && result.isValid()) {
             Pose3D botpose = result.getBotpose();
             if (botpose != null) {
-                telemetry.addData("tx", result.getTx());
-                telemetry.addData("ty", result.getTy());
-                startPose = new Pose2d(new Vector2d(result.getBotpose().getPosition().x,result.getBotpose().getPosition().y),result.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES));
-                telemetry.addData("Start pose", startPose.toString());
+                startPose = new Pose2d(new Vector2d(botpose.getPosition().x*39.37,botpose.getPosition().y*39.37),botpose.getOrientation().getYaw(AngleUnit.RADIANS));                telemetry.addData("Start pose", startPose.toString());
             }
         }
         // Push telemetry to the Driver Station.
         telemetry.update();
 
         drive = new SampleMecanumDrive(hardwareMap);
-
+        drive.setPoseEstimate(startPose);
         Trajectory tr1 = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(0, -10), 90)
+                .splineToLinearHeading(new Pose2d(10, 40,Math.toRadians(270)), 0)
                 .build();
-//        Trajectory tr2 = drive.trajectoryBuilder(tr1.end())
-//                .back(7)
-//                .build();
-//        Trajectory tr3 = drive.trajectoryBuilder(tr2.end())
-//                .splineTo(new Vector2d(60, -105.5), 0)
-//                .build();
-//        Trajectory tr4 = drive.trajectoryBuilder(tr3.end())
-//                .splineToLinearHeading(new Pose2d(8, 48, Math.toRadians(-225)), 0)
-//                .build();
+        Trajectory tr2 = drive.trajectoryBuilder(tr1.end())
+                .back(15)
+                .build();
+        Trajectory tr3 = drive.trajectoryBuilder(tr2.end())
+                .splineToLinearHeading(new Pose2d(48, 45,Math.toRadians(-84.57)), 5)
+                .build();
+        Trajectory tr4 = drive.trajectoryBuilder(tr3.end())
+                .splineToLinearHeading(new Pose2d(61, 60, Math.toRadians(61)), 0)
+                .build();
 //        Trajectory tr5 = drive.trajectoryBuilder(tr4.end())
 //                .splineToLinearHeading(new Pose2d(12, 41, 0), 0)
 //                .build();
@@ -203,38 +201,39 @@ public class PerfectAuto extends LinearOpMode {
         if (isStopRequested()) return;
 //
 //        /***** start of manual code running or initiation or whatever *****/
-//        controlGrabber(CLOSE);
-//        armRotPos = -2462.416;
-//        wristRotPos = 0.615;
-//        controlWristRotate();
-//        controlArmRotate();
-//        sleep(600);
+        controlGrabber(CLOSE);
+        armRotPos = -2532.9;
+        wristRotPos = 0.63;
+        controlWristRotate();
+        controlArmRotate();
+        sleep(800);
         drive.followTrajectory(tr1);
-//        wristRotPos = 0.63;
-//        armRotPos = -2392.33;
-//        controlArmRotate();
-//        controlWristRotate();
-//        sleep(100);
-//        drive.followTrajectory(tr2);
-//        controlGrabber(OPEN);
-////        sleep(500);
-//        drive.followTrajectory(tr3);
-//        armRotPos = -611;
-//        wristRotPos = 0.57;
-//        controlArmRotate();
-//        controlWristRotate();
-//        sleep(600);
-//        controlGrabber(CLOSE); //first sample
-//        sleep(1000);
-//        armRotPos = -2930;
-//        wristRotPos = 0.63;
-//        armPos = -4015.5;
-//        controlWristRotate();
-//        controlArmRotate();
-//        controlBothArmExtenders();
-//        sleep(300);
-//        drive.followTrajectory(tr4);
-//        controlGrabber(OPEN);
+        wristRotPos = 0.63;
+        armRotPos = -2532.9;
+        controlArmRotate();
+        controlWristRotate();
+        sleep(100);
+        drive.followTrajectory(tr2);
+        controlGrabber(OPEN);
+        sleep(500);
+        drive.followTrajectory(tr3);
+        armRotPos = -455;
+        wristRotPos = 0.525;
+        controlArmRotate();
+        controlWristRotate();
+        sleep(600);
+        controlGrabber(CLOSE); //first sample
+        sleep(1000);
+        armRotPos = -2838;
+        wristRotPos = 0.57;
+        armPos = -1683;
+        controlWristRotate();
+        controlArmRotate();
+        controlBothArmExtenders();
+        sleep(300);
+        drive.followTrajectory(tr4);
+        controlGrabber(OPEN);
+        sleep(300);//temp
 //        drive.followTrajectory(tr5);
 //        sleep(300);
 //        drive.followTrajectory(tr6);

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OriginalTeamCode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.PwmControl.*;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
@@ -176,8 +178,9 @@ public class FirstRealTeleop extends LinearOpMode {
                 if (botpose != null) {
                     double x = botpose.getPosition().x;
                     double y = botpose.getPosition().y;
-                    telemetry.addData("MT1 Location", "(" + x + ", " + y + ")");
-                }
+
+                    Pose2d startPose = new Pose2d(new Vector2d(botpose.getPosition().x*39.37,botpose.getPosition().y*39.37),botpose.getOrientation().getYaw(AngleUnit.RADIANS));
+                    telemetry.addData("Start pose", startPose.toString());                }
             }
             // Push telemetry to the Driver Station.
             telemetry.update();
