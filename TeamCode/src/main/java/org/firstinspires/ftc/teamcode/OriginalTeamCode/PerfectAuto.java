@@ -25,10 +25,10 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
-// Team 23974 A.S.T.R.O. Vikings, water 2024-2025
 @Autonomous(name="Specimen And High Baskets Auto", group ="AHHHHHHHH", preselectTeleOp = "Teleop To Use :))))")
 public class PerfectAuto extends LinearOpMode {
 
+    public START_POSITION startPosition;
     Limelight3A limelight;
     final double OPEN = 0.75;
     final double CLOSE = 0.4;
@@ -77,6 +77,51 @@ public class PerfectAuto extends LinearOpMode {
 
     void controlWristRotate(){
         wrist.setPosition(wristRotPos);
+    }
+
+    public void selectStartingPosition() {
+
+        //******select start pose***);
+            telemetry.addData("---------------------------------------","");
+            telemetry.addData("Select Starting Position using XYAB on gamepad 1:","");
+            telemetry.addData("    Blue Left   ", "(X)");
+            telemetry.addData("    Blue Right ", "(Y)");
+            telemetry.addData("    Red Left    ", "(B)");
+            telemetry.addData("    Red Right  ", "(A)");
+            while(!isStopRequested())
+            {
+            if(gamepad1.x){
+                startPosition = START_POSITION.BLUE_LEFT;
+                return;
+            }
+            if(gamepad1.y){
+                startPosition = START_POSITION.BLUE_RIGHT;
+                return;
+            }
+            if(gamepad1.b){
+                startPosition = START_POSITION.RED_LEFT;
+                return;
+            }
+            if(gamepad1.a){
+                startPosition = START_POSITION.RED_RIGHT;
+                return;
+            }
+            telemetry.update();
+            }
+        }
+    
+
+    void resetPosWithLL(Pose2d defaultPose){
+        Pose2d curPose =  defaultPose;
+        LLResult result = limelight.getLatestResult();
+        if (result != null && result.isValid()) {
+            Pose3D botpose = result.getBotpose();
+            if (botpose != null) {
+                curPose = new Pose2d(new Vector2d(botpose.getPosition().x*39.37,botpose.getPosition().y*39.37),botpose.getOrientation().getYaw(AngleUnit.RADIANS));
+                drive.setPoseEstimate(curPose);
+            }
+        }
+
     }
 
     @Override
@@ -131,6 +176,9 @@ public class PerfectAuto extends LinearOpMode {
             sleep(20);
         }
 
+        selectStartingPosition();
+        telemetry.addData("Selected Starting Position", startPosition);
+
         LLResult result = limelight.getLatestResult();
         telemetry.addData("", "got latest result");
         if (result != null) {
@@ -147,116 +195,194 @@ public class PerfectAuto extends LinearOpMode {
             }
         }
         // Push telemetry to the Driver Station.
-        telemetry.update();
 
+        telemetry.update();
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
-        Trajectory tr1 = drive.trajectoryBuilder(startPose)
-                .splineToLinearHeading(new Pose2d(10, 40,Math.toRadians(270)), 0)
-                .build();
-        Trajectory tr2 = drive.trajectoryBuilder(tr1.end())
-                .back(15)
-                .build();
-        Trajectory tr3 = drive.trajectoryBuilder(tr2.end())
-                .splineToLinearHeading(new Pose2d(48, 45,Math.toRadians(-84.57)), 5)
-                .build();
-        Trajectory tr4 = drive.trajectoryBuilder(tr3.end())
-                .splineToLinearHeading(new Pose2d(61, 60, Math.toRadians(61)), 0)
-                .build();
-//        Trajectory tr5 = drive.trajectoryBuilder(tr4.end())
-//                .splineToLinearHeading(new Pose2d(12, 41, 0), 0)
-//                .build();
-//        Trajectory tr6 = drive.trajectoryBuilder(tr5.end())
-//                .splineToConstantHeading(new Vector2d(20, 50), 0)
-//                .addTemporalMarker(1.25, () -> {
-//                    armRotPos = -611;
-//                    wristRotPos = 0.57;
-//                    armPos = 30;
-//                    controlBothArmExtenders();
-//                    controlArmRotate();
-//                    controlWristRotate();
-//                })
-//                .build();
-//        Trajectory tr7 = drive.trajectoryBuilder(tr6.end())
-//                .splineToSplineHeading(new Pose2d(5, 50, Math.toRadians(130)), 0)
-//                .build();
-//        Trajectory tr8 = drive.trajectoryBuilder(tr7.end())
-//                .back(8)
-//                .splineToSplineHeading(new Pose2d(54, 30, Math.toRadians(90)), 0)
-//                .addTemporalMarker(0.75, () -> {
-//                    controlArmRotate();
-//                    controlWristRotate();
-//                    controlBothArmExtenders();
-//                })
-//                .build();
-//        Trajectory tr9 = drive.trajectoryBuilder(tr8.end())
-//                .splineToConstantHeading(new Vector2d(54, 6), 0)
-//                .addTemporalMarker(.25, () -> {
-//                    armPos = -3400;
-//                    controlBothArmExtenders();
-//                })
-//                .build();
+        //hang spec
+        Trajectory tr1 = null;
+        Trajectory tr2 = null;
+        Trajectory tr3 = null;
+        Trajectory tr4 = null;
+        Trajectory tr5 = null;
+        Trajectory tr6 = null;
+        Trajectory tr7 = null;
+        Trajectory tr8 = null;
+        Trajectory tr9 = null;
+        switch (startPosition) {
+            case BLUE_LEFT:
+            tr1 = drive.trajectoryBuilder(startPose)
+                    .splineToLinearHeading(new Pose2d(10, 38,Math.toRadians(270)), 0)
+                    .build();
+            tr2 = drive.trajectoryBuilder(tr1.end())
+                    .back(16)
+                    .build();
+            //pick up 1st samp
+            tr3 = drive.trajectoryBuilder(tr2.end())
+                    .splineToLinearHeading(new Pose2d(50, 48.9,Math.toRadians(-84.57)), 5)
+                    .build();
+            //drop off
+            tr4 = drive.trajectoryBuilder(tr3.end())
+                    .splineToLinearHeading(new Pose2d(68, 63, Math.toRadians(68)), 0)
+                    .build();
+            //fix self
+            tr5 = drive.trajectoryBuilder(tr4.end())
+                    .splineToLinearHeading(new Pose2d(58, 60, Math.toRadians(270)), 0)
+                    .build();
+            //pick up 2nd sample
+            tr6 = drive.trajectoryBuilder(tr5.end())
+                    .splineToConstantHeading(new Vector2d(65, 48.9), 0)
+                    .addTemporalMarker(.05, () -> {
+                        armRotPos = -651;
+                        wristRotPos = 0.55;
+                        armPos = 40;
+                        controlBothArmExtenders();
+                        controlArmRotate();
+                        controlWristRotate();
+                    })
+                    .build();
+            //drop off
+            tr7 = drive.trajectoryBuilder(tr6.end())
+                    .splineToLinearHeading(new Pose2d(67, 63, Math.toRadians(67.9)), 0)
+                    .build();
+            //line up
+            tr8 = drive.trajectoryBuilder(tr7.end())
+                    .back(8)
+                    .splineToSplineHeading(new Pose2d(40, 14, Math.toRadians(0)), 0)
+                    .addTemporalMarker(0.6, () -> {
+                        controlArmRotate();
+                        controlWristRotate();
+                        controlBothArmExtenders();
+                    })
+                    .build();
+            //lvl 1 ascent/park
+            tr9 = drive.trajectoryBuilder(tr8.end())
+                    .splineToConstantHeading(new Vector2d(32, 14), 0)
+                    .addTemporalMarker(.001, () -> {
+                        armPos = -3400;
+                        controlBothArmExtenders();
+                    })
+                    .build();
+            break;
+            case RED_LEFT://---------------------------------------------------------------------------
+                tr1 = drive.trajectoryBuilder(startPose)
+                        .splineToLinearHeading(new Pose2d(-10, -46,Math.toRadians(270+180)), 0)
+                        .build();
+                tr2 = drive.trajectoryBuilder(tr1.end())
+                        .back(14)
+                        .build();
+                //pick up 1st samp
+                tr3 = drive.trajectoryBuilder(tr2.end())
+                        .splineToLinearHeading(new Pose2d(-50, -50.9,Math.toRadians(-84.57+180)), 5)
+                        .build();
+                //drop off
+                tr4 = drive.trajectoryBuilder(tr3.end())
+                        .splineToLinearHeading(new Pose2d(-68, -67, Math.toRadians(68+180)), 0)
+                        .build();
+                //fix self
+                tr5 = drive.trajectoryBuilder(tr4.end())
+                        .splineToLinearHeading(new Pose2d(-58, -65, Math.toRadians(270+180)), 0)
+                        .build();
+                //pick up 2nd sample
+                tr6 = drive.trajectoryBuilder(tr5.end())
+                        .splineToConstantHeading(new Vector2d(-65, -50.9), 0)
+                        .addTemporalMarker(.05, () -> {
+                            armRotPos = -651;
+                            wristRotPos = 0.57;
+                            armPos = 40;
+                            controlBothArmExtenders();
+                            controlArmRotate();
+                            controlWristRotate();
+                        })
+                        .build();
+                //drop off
+                tr7 = drive.trajectoryBuilder(tr6.end())
+                        .splineToLinearHeading(new Pose2d(-67, -67, Math.toRadians(67.9+90)), 0)
+                        .build();
+                //line up
+                tr8 = drive.trajectoryBuilder(tr7.end())
+                        .back(8)
+                        .splineToSplineHeading(new Pose2d(-40, -19, Math.toRadians(0+180)), 0)
+                        .addTemporalMarker(1.2, () -> {
+                            controlArmRotate();
+                            controlWristRotate();
+                            controlBothArmExtenders();
+                        })
+                        .build();
+                //lvl 1 ascent/park
+                tr9 = drive.trajectoryBuilder(tr8.end())
+                        .splineToConstantHeading(new Vector2d(-26, -19), 0)
+                        .addTemporalMarker(.001, () -> {
+                            armPos = -3400;
+                            controlBothArmExtenders();
+                        })
+                        .build();
+        }
 //
         waitForStart(); /*****  DON'T RUN ANY MOTOR MOVEMENT ABOVE THIS LINE!! You WILL get PENALTIES! And it's UNSAFE! *****/
         if (isStopRequested()) return;
 //
 //        /***** start of manual code running or initiation or whatever *****/
         controlGrabber(CLOSE);
-        armRotPos = -2532.9;
-        wristRotPos = 0.63;
+        armRotPos = -2552.9;
+        wristRotPos = 0.65;
         controlWristRotate();
         controlArmRotate();
-        sleep(800);
+        sleep(600);
         drive.followTrajectory(tr1);
         wristRotPos = 0.63;
         armRotPos = -2532.9;
         controlArmRotate();
         controlWristRotate();
         sleep(100);
+//        resetPosWithLL(drive.getPoseEstimate());
         drive.followTrajectory(tr2);
         controlGrabber(OPEN);
-        sleep(500);
+        sleep(200);
+//        resetPosWithLL(drive.getPoseEstimate());
         drive.followTrajectory(tr3);
         armRotPos = -455;
-        wristRotPos = 0.525;
+        wristRotPos = 0.53;
         controlArmRotate();
         controlWristRotate();
-        sleep(600);
+        sleep(750);
         controlGrabber(CLOSE); //first sample
-        sleep(1000);
+        sleep(600);
         armRotPos = -2838;
         wristRotPos = 0.57;
-        armPos = -1683;
+        armPos = -1883;
         controlWristRotate();
         controlArmRotate();
         controlBothArmExtenders();
-        sleep(300);
+        sleep(350);
+//        resetPosWithLL(drive.getPoseEstimate());
         drive.followTrajectory(tr4);
+        sleep(100);
         controlGrabber(OPEN);
-        sleep(300);//temp
-//        drive.followTrajectory(tr5);
+        sleep(200);
+        drive.followTrajectory(tr5);
 //        sleep(300);
-//        drive.followTrajectory(tr6);
-//        sleep(600);
-//        controlGrabber(CLOSE); //2nd sample
-//        sleep(900);
-//        armRotPos = -2964.3;
-//        wristRotPos = 0.63;
-//        armPos = -4032.1;
-//        controlWristRotate();
-//        controlArmRotate();
+        drive.followTrajectory(tr6);
+        sleep(700);
+        controlGrabber(CLOSE); //2nd sample
+        sleep(600);
+        armRotPos = -2964.3;
+        wristRotPos = 0.65;
+        armPos = -4732.1;
+        controlWristRotate();
+        controlArmRotate();
+        controlBothArmExtenders();
+        sleep(250);
+        drive.followTrajectory(tr7);
+        controlGrabber(OPEN);
+        sleep(300);
+        armPos = 0;
 //        controlBothArmExtenders();
-////        sleep(250);
-//        drive.followTrajectory(tr7);
-//        controlGrabber(OPEN);
-//        sleep(300);
-//        armPos = 0;
-////        controlBothArmExtenders();
-////        armPos = -3400;
-//        wristRotPos = 0.4;
-//        armRotPos = 20;
-//        drive.followTrajectory(tr8);
-//        drive.followTrajectory(tr9);
+//        armPos = -3400;
+        wristRotPos = 0.4;
+        armRotPos = 20;
+        drive.followTrajectory(tr8);
+        drive.followTrajectory(tr9);
 
 
         /***** end of manual code running or initiation or whatever *****/
