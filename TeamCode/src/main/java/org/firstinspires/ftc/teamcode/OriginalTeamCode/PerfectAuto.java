@@ -25,7 +25,7 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
-@Autonomous(name="Specimen And High Baskets Auto", group ="AHHHHHHHH", preselectTeleOp = "Teleop To Use :))))")
+@Autonomous(name="Auto :)", group ="AHHHHHHHH", preselectTeleOp = "Teleop To Use :))))")
 public class PerfectAuto extends LinearOpMode {
 
     public START_POSITION startPosition;
@@ -277,7 +277,7 @@ public class PerfectAuto extends LinearOpMode {
                         .build();
                 //drop off
                 tr4 = drive.trajectoryBuilder(tr3.end())
-                        .splineToLinearHeading(new Pose2d(-68, -67, Math.toRadians(68+180)), 0)
+                        .splineToLinearHeading(new Pose2d(-68.5, -66.5, Math.toRadians(68+180)), 0)
                         .build();
                 //fix self
                 tr5 = drive.trajectoryBuilder(tr4.end())
@@ -286,10 +286,10 @@ public class PerfectAuto extends LinearOpMode {
                 //pick up 2nd sample
                 tr6 = drive.trajectoryBuilder(tr5.end())
                         .splineToConstantHeading(new Vector2d(-65, -50.9), 0)
-                        .addTemporalMarker(.05, () -> {
+                        .addTemporalMarker(.2, () -> {
                             armRotPos = -651;
-                            wristRotPos = 0.57;
-                            armPos = 40;
+                            wristRotPos = 0.576;
+                            armPos = 100;
                             controlBothArmExtenders();
                             controlArmRotate();
                             controlWristRotate();
@@ -297,13 +297,13 @@ public class PerfectAuto extends LinearOpMode {
                         .build();
                 //drop off
                 tr7 = drive.trajectoryBuilder(tr6.end())
-                        .splineToLinearHeading(new Pose2d(-67, -67, Math.toRadians(67.9+90)), 0)
+                        .splineToLinearHeading(new Pose2d(-67.5, -66.5, Math.toRadians(67.9+180.2)), 0)
                         .build();
                 //line up
                 tr8 = drive.trajectoryBuilder(tr7.end())
                         .back(8)
                         .splineToSplineHeading(new Pose2d(-40, -19, Math.toRadians(0+180)), 0)
-                        .addTemporalMarker(1.2, () -> {
+                        .addTemporalMarker(1, () -> {
                             controlArmRotate();
                             controlWristRotate();
                             controlBothArmExtenders();
@@ -342,7 +342,7 @@ public class PerfectAuto extends LinearOpMode {
 //        resetPosWithLL(drive.getPoseEstimate());
         drive.followTrajectory(tr3);
         armRotPos = -455;
-        wristRotPos = 0.53;
+        wristRotPos = 0.55;
         controlArmRotate();
         controlWristRotate();
         sleep(750);
@@ -380,7 +380,7 @@ public class PerfectAuto extends LinearOpMode {
 //        controlBothArmExtenders();
 //        armPos = -3400;
         wristRotPos = 0.4;
-        armRotPos = 20;
+        armRotPos = -100;
         drive.followTrajectory(tr8);
         drive.followTrajectory(tr9);
 

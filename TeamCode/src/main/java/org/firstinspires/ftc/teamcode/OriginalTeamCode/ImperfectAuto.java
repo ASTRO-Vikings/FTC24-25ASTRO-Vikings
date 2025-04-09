@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,6 +21,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 // Team 23974 A.S.T.R.O. Vikings, water 2024-2025
 @Autonomous(name="Specimen and Park Auto", group ="AHHHHHHHH", preselectTeleOp = "Teleop To Use :))))")
+@Disabled
 public class ImperfectAuto extends LinearOpMode {
     final double OPEN = 0.75;
     final double CLOSE = 0.4;
