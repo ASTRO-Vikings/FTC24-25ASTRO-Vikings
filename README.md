@@ -1,1 +1,1 @@
-astro vkigkings github ;)
+astro vikings github :)
